@@ -1,6 +1,6 @@
 #include <stdio.h>
 
 int main(){
-    printf("so i need to test the dependecies.\n");
+    printf("this is issue fix with pull resqueste.\n");
     return 0;
 }
