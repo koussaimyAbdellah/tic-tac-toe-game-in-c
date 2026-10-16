@@ -1,0 +1,31 @@
+# tic tac toe game
+
+## how to run
+
+```bach
+    #download then executable file and double click
+    #in realse section 
+
+    #or run clone with git if you like to contrubute or #build the executable with your self.
+
+    #clone repos
+    git clone repos_adress# copy it form github repos.
+    
+    #then the whole project will be in you laptop.
+
+    git pull # for updates.
+```
+
+## explanation about game
+
+this is typical x o game so there is nothing new ,
+its work on console interface whit two modes:
+
+- solo:
+  you play with ai with diffucilties level.
+  more you chose harder bot you will face stronger bot
+  the last bot use **minimax algorithme** so good luck to beat him.
+- multiplayer:
+    this mode is where you play with your friend in same place so have fun .
+
+you just need to chosse your mark and start play then if the one how one will print it and show the border with colored winning line.
