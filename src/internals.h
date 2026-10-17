@@ -13,4 +13,13 @@
  */
 int read_input(int *var);
 
+/**
+ * @brief read user mark to start with.
+ * if user sumbber wrong mark it keep ask him tell 
+ * he give the correct choice.
+ * set mark direclty via pointer
+ * @param c is the mark must be x or o. 
+ * @return 1 if succes 0 if failed -1 if eof.
+ */
+int read_mark(char *c);
 #endif

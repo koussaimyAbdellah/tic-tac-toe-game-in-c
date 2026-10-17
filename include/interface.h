@@ -1,11 +1,13 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
+typedef void (*interface)();
+
 /**
  * main user interface,here is where we move to other interface
  * contain two interface 0 and 1. 
  */
-void interface0();
+void interface0(interface i1,interface i2);
 
 /**
  * multuplayer interface ,after you chose these interface 
