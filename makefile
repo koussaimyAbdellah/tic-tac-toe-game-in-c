@@ -19,7 +19,7 @@ build/ai_stratigie.o: src/ai_stratigie.c include/ai_stratigie.h include/game_log
 	mkdir -p build
 	gcc -Iinclude src/ai_stratigie.c -c -o build/ai_stratigie.o
 
-.phony: clean run rebuild all push
+.phony: clean run rebuild all
 
 all: bin/game
 
