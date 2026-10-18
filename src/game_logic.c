@@ -99,8 +99,33 @@ int set_mark_sp(marks* m,int *tab,int index,int *arr,int size){
     
 }
 
-void set_mark(marks* m,int *tab,int index){
-    set_mark_sp(m,tab,index,NULL,-1);
+bool set_mark(marks* m,int *tab,int index){
+    // set_mark_sp(m,tab,index,NULL,-1);
+
+        if (index>9 || index < 0)
+        {
+            fprintf(stderr,"invalid index: must be in withen range   0-9\n");
+            return-false;
+        }
+        
+        if (tab[index] != -1)
+        {
+            fprintf(stderr,"invalid index: you need to chose unocupped place.\n");
+            return false;
+        }
+
+        if (m->last_round == m->player)
+        {
+            tab[index] =  PLAYER;
+            m->last_round = m->bot;
+        }
+        else
+        {
+            tab[index] = BOT;
+            m->last_round = m->player;
+        }
+        
+        return true;
 }
 
 game_info *game_init(char m){
@@ -140,6 +165,10 @@ int check_win(const int *tab){
     {
         if (tab[i] == tab[i+3] && tab[i] == tab[i+6])
         {
+            if (tab[i] == EMPTHY)
+            {
+                continue;;
+            }
             return 1;   
         }
     }
@@ -148,6 +177,10 @@ int check_win(const int *tab){
     {
         if (tab[i] == tab[i+1] && tab[i] == tab[i+2])
         {
+            if (tab[i] == EMPTHY)
+            {
+                continue;;
+            }
             return 1;
         }   
     }
@@ -155,6 +188,10 @@ int check_win(const int *tab){
     {
         if (tab[i] == tab[4] && tab[8-i] == tab[4])
         {
+            if (tab[i] == EMPTHY)
+            {
+                continue;;
+            }
             return 1;
         }
     }

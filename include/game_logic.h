@@ -1,5 +1,9 @@
+#include <stdbool.h>
+
 #ifndef GAME_LOGIC_H
-#define GAMAE_LOGIC_H
+#define GAME_LOGIC_H
+
+
 
 typedef struct choice_mark
 {
@@ -31,11 +35,11 @@ int* init_table();
 
 int set_mark_sp(marks* m,int *tab,int index,int *arr,int size);
 
-void set_mark(marks* m,int *tab,int index);
+bool set_mark(marks* m,int *tab,int index);
 
 game_info *game_init(char m);
 
-int check_win(int *tab);
+int check_win(const int *tab);
 
 void clean_up(game_info *gm);
 

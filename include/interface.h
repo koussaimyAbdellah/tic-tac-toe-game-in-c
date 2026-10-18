@@ -2,6 +2,7 @@
 #define INTERFACE_H
 
 typedef void (*interface)();
+typedef void (*game_p)(char);
 
 /**
  * main user interface,here is where we move to other interface

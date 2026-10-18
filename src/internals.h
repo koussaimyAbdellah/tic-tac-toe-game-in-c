@@ -1,6 +1,8 @@
 #ifndef INTER_HELPER_I_H
 #define  INTER_HELPER_I_H
 
+#include "game_logic.h"
+
 /**
  * @brief read input intgers form stdin,
  * and flush the inputbuffer for integer value

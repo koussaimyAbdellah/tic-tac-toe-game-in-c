@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "ai_stratigie.h"
-#include "game_logic.h"
 #include "interface.h"
 #include "internals.h"
 
@@ -146,7 +145,7 @@ static void helper2(char *m){
         return;
     }  
 }
-static int helper3(int *option,char * mark,interface i){
+static int helper3(int *option,char * mark,game_p g){
             int op;
 
             while (true)
@@ -173,7 +172,7 @@ static int helper3(int *option,char * mark,interface i){
                 {
                     /*printf("case 1: call game to play in multi player mode.\n");
                     printf("option: %d,mark: %c.\n",*option,*mark);*/
-                    i();// callback
+                    g(*mark);// callback
                     return op;
                 }else if(op == 2){
                     return op;
@@ -233,9 +232,42 @@ void interface2(){
 
 //----------------------------------------------------//
 
-void print_border(game_info* gm){
-
+void print_border(game_info *gm){
+    int bn = 2;
+    printf("\n");
+    for (int i = 0; i < 3; i++)
+    {
+        int n = 2;
+        for (int j = i; j < 3+i; j++)
+        {
+            if (gm->tab[j] == PLAYER)
+            {
+                printf("%c",gm->m->player);
+            }else if (gm->tab[j] == BOT)
+            {
+                printf("%c",gm->m->bot);
+            }else if (gm->tab[j] == EMPTHY)
+            {
+                printf("%c",' ');
+            }
+            
+            
+            if (n > 0)
+            {
+                printf("|");
+                n--;
+            }
+        }
+        printf("\n");
+        if (bn > 0)
+        {
+            printf("_____\n");
+            bn--;
+        }        
+    } 
+    printf("\n");
 }
+
 int get_index(){
     int i ;
     while (true)
@@ -245,7 +277,7 @@ int get_index(){
 
         if (res == -1)
         {
-            printf('\n');
+            printf("\n");
             return-1;
         }
         if (res != 1)
@@ -261,39 +293,50 @@ int get_index(){
         }
         
         return i;
-    }
-    
-    
-    
+    } 
 }
 
 void game_start(game_info *gm){
     bool game_over = false;
+
     int eval;
     int index;
+
     while (!game_over)
     {
-        eval = check_win(gm->tab);
+        
         if (eval == 1)
         {
-            
+            char winner = (gm->m->last_round == gm->m->player)?gm->m->bot:gm->m->player;
+            int winner_num = (gm->m->last_round == gm->m->player)?2:1;
+            printf("player %d,with mark %c was win.\n",winner_num,winner);
+            clean_up(gm);
+            game_over = true;
+            continue;   
         }else if(eval == 0 && gm->empthy_count <= 0){
-
+            printf("draw,no ones win.\n");
+            clean_up(gm);
+            game_over = true;
+            continue;
         }
-        
+
         index = get_index();
 
         if (index == -1)
         {
-            printf('\n');
+            printf("\n");
             return;
         }
-        set_mark(gm->m,gm->tab,index-1);
+
+        if(set_mark(gm->m,gm->tab,index-1)){
+            continue;
+        }
         gm->empthy_count--;
 
+        eval = check_win(gm->tab);
+
         print_border(gm);
-    }
-    
+    } 
 }
 
 void game(char mark){
