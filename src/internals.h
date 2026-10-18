@@ -22,4 +22,11 @@ int read_input(int *var);
  * @return 1 if succes 0 if failed -1 if eof.
  */
 int read_mark(char *c);
+
+void game_start(game_info *gm);
+
+void print_border(game_info *gm);
+
+int get_index();
+
 #endif

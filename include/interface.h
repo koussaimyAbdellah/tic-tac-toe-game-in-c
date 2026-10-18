@@ -23,4 +23,12 @@ void interface1();
  */
 void interface2();
 
+/**
+ * this is the real start of game .
+ * by calling this function. that mean you inint the game and
+ * start playing for now i will just make it for one mode 
+ * then later i will make this function chose between modes
+ * based on case that been called form .
+ */
+void game(char mark);
 #endif

@@ -146,7 +146,7 @@ static void helper2(char *m){
         return;
     }  
 }
-static int helper3(int *option,char * mark){
+static int helper3(int *option,char * mark,interface i){
             int op;
 
             while (true)
@@ -171,8 +171,9 @@ static int helper3(int *option,char * mark){
                 }
                 if (op == 1)
                 {
-                    printf("case 1: call game to play in multi player mode.\n");
-                    printf("option: %d,mark: %c.\n",*option,*mark);
+                    /*printf("case 1: call game to play in multi player mode.\n");
+                    printf("option: %d,mark: %c.\n",*option,*mark);*/
+                    i();// callback
                     return op;
                 }else if(op == 2){
                     return op;
@@ -204,7 +205,7 @@ void interface1(){
         
         if (option == 1)
         {
-            int temp = helper3(&option,&mark);
+            int temp = helper3(&option,&mark,game);
             if(temp == -1){
                 printf("\n");
                 return;
@@ -228,4 +229,74 @@ void interface1(){
 
 void interface2(){
 
+}
+
+//----------------------------------------------------//
+
+void print_border(game_info* gm){
+
+}
+int get_index(){
+    int i ;
+    while (true)
+    {
+        printf("give your index betwen 1-9.(choose a emthpy place)\n");
+        int res = read_input(&i);
+
+        if (res == -1)
+        {
+            printf('\n');
+            return-1;
+        }
+        if (res != 1)
+        {
+            printf("give the correct choice .\n");
+            continue;
+        }
+
+        if (i> 9 || i < 1)
+        {
+            printf("give the correct choice .\n");
+            continue;
+        }
+        
+        return i;
+    }
+    
+    
+    
+}
+
+void game_start(game_info *gm){
+    bool game_over = false;
+    int eval;
+    int index;
+    while (!game_over)
+    {
+        eval = check_win(gm->tab);
+        if (eval == 1)
+        {
+            
+        }else if(eval == 0 && gm->empthy_count <= 0){
+
+        }
+        
+        index = get_index();
+
+        if (index == -1)
+        {
+            printf('\n');
+            return;
+        }
+        set_mark(gm->m,gm->tab,index-1);
+        gm->empthy_count--;
+
+        print_border(gm);
+    }
+    
+}
+
+void game(char mark){
+    game_info *gm = game_init(mark);
+    game_start(gm);
 }
