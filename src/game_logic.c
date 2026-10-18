@@ -102,10 +102,10 @@ int set_mark_sp(marks* m,int *tab,int index,int *arr,int size){
 bool set_mark(marks* m,int *tab,int index){
     // set_mark_sp(m,tab,index,NULL,-1);
 
-        if (index>9 || index < 0)
+        if (index>8 || index < 0)
         {
             fprintf(stderr,"invalid index: must be in withen range   0-9\n");
-            return-false;
+            return false;
         }
         
         if (tab[index] != -1)

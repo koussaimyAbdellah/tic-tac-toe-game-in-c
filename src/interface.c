@@ -235,22 +235,21 @@ void interface2(){
 void print_border(game_info *gm){
     int bn = 2;
     printf("\n");
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 7; i = i+3)
     {
         int n = 2;
         for (int j = i; j < 3+i; j++)
         {
-            if (gm->tab[j] == PLAYER)
+            if (gm->tab[j] == 0)
             {
                 printf("%c",gm->m->player);
-            }else if (gm->tab[j] == BOT)
+            }else if (gm->tab[j] == 1)
             {
                 printf("%c",gm->m->bot);
-            }else if (gm->tab[j] == EMPTHY)
+            }else if (gm->tab[j] == -1)
             {
-                printf("%c",' ');
+                printf("%d",j+1);
             }
-            
             
             if (n > 0)
             {
@@ -304,17 +303,22 @@ void game_start(game_info *gm){
 
     while (!game_over)
     {
-        
+       
+        printf("[-<player with %c round>-]",gm->m->last_round);
+        print_border(gm);
+
         if (eval == 1)
         {
             char winner = (gm->m->last_round == gm->m->player)?gm->m->bot:gm->m->player;
             int winner_num = (gm->m->last_round == gm->m->player)?2:1;
-            printf("player %d,with mark %c was win.\n",winner_num,winner);
+            printf("->>>{player %d,with mark %c was win.}<<<-\n",winner_num,winner);
+
             clean_up(gm);
             game_over = true;
-            continue;   
+            continue;  
         }else if(eval == 0 && gm->empthy_count <= 0){
-            printf("draw,no ones win.\n");
+            printf("->>>{draw,no ones win.}<<<-\n");
+
             clean_up(gm);
             game_over = true;
             continue;
@@ -322,20 +326,23 @@ void game_start(game_info *gm){
 
         index = get_index();
 
+        
+
         if (index == -1)
         {
             printf("\n");
             return;
         }
 
-        if(set_mark(gm->m,gm->tab,index-1)){
+        if(!set_mark(gm->m,gm->tab,index-1)){
             continue;
         }
+        
         gm->empthy_count--;
 
-        eval = check_win(gm->tab);
 
-        print_border(gm);
+        eval = check_win(gm->tab);  
+
     } 
 }
 
