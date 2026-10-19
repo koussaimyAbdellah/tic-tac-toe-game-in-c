@@ -55,7 +55,7 @@ int* init_table(){
 
 int set_mark_sp(marks* m,int *tab,int index,int *arr,int size){
 
-    if (index>9 || index < 0)
+    if (index>8 || index < 0)
     {
         fprintf(stderr,"invalid index: must be in withen range   0-9\n");
         return-1;

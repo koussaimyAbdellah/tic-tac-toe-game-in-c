@@ -2,7 +2,6 @@
 #include <stdbool.h>
 #include "ai_stratigie.h"
 #include "interface.h"
-#include "internals.h"
 
 //-----------------------------------------------------------------------//
 /*====================================*/
@@ -97,7 +96,7 @@ void interface0(interface i1,interface i2){
 }
 //--------------------------------------------------------------------------//
 
-static void helper1(int *op){
+static void read_option_interface(int *op){
     while (true)
     {
             printf("===========================\n");
@@ -123,7 +122,7 @@ static void helper1(int *op){
     } 
 }
 
-static void helper2(char *m){
+static void read_mark_interface(char *m){
     while (true)
     {
         printf("=====================================\n");
@@ -145,7 +144,8 @@ static void helper2(char *m){
         return;
     }  
 }
-static int helper3(int *option,char * mark,game_p g){
+
+static int game_interface(int *option,char * mark,game_p g){
             int op;
 
             while (true)
@@ -172,6 +172,7 @@ static int helper3(int *option,char * mark,game_p g){
                 {
                     /*printf("case 1: call game to play in multi player mode.\n");
                     printf("option: %d,mark: %c.\n",*option,*mark);*/
+                    //this is the real game call from this callback we run the game.
                     g(*mark);// callback
                     return op;
                 }else if(op == 2){
@@ -191,7 +192,7 @@ void interface1(){
 
     while (true)
     {
-        helper1(&option);
+        read_option_interface(&option);//an interface to read option with options.
         
         if (option == 0)
         {
@@ -199,12 +200,12 @@ void interface1(){
             break;
         }
         
-        helper2(&mark);
+        read_mark_interface(&mark);
 
         
         if (option == 1)
         {
-            int temp = helper3(&option,&mark,game);
+            int temp = game_interface(&option,&mark,game);//interface connect loigc game whit user interface
             if(temp == -1){
                 printf("\n");
                 return;
@@ -271,7 +272,7 @@ int get_index(){
     int i ;
     while (true)
     {
-        printf("give your index betwen 1-9.(choose a emthpy place)\n");
+        printf("{give your index betwen 1-9.(choose a emthpy place)}\n");
         int res = read_input(&i);
 
         if (res == -1)
@@ -347,6 +348,6 @@ void game_start(game_info *gm){
 }
 
 void game(char mark){
-    game_info *gm = game_init(mark);
-    game_start(gm);
+    game_info *gm = game_init(mark);//call form logic side to init game info.
+    game_start(gm);// here is the actuale game loop.
 }
