@@ -228,7 +228,46 @@ void interface1(){
 //---------------------------------------------------------------//
 
 void interface2(){
+    int option;
+    char mark;
 
+    printf(">>>>>>>>>>>===========<<<<<<<<<<<\n");
+    printf(">>     solo interface    <<\n");
+    printf(">>>>>>>>>>>===========<<<<<<<<<<<\n");
+
+    while (true)
+    {
+        read_option_interface(&option);
+
+        if (option == 0)
+        {
+            printf("case 0: exit interface.\n");
+            break;
+        }
+        
+        read_mark_interface(&mark);
+
+        if (option == 1)
+        {
+            int temp = game_interface(&option,&mark,game_solo);//interface connect loigc game whit user interface
+            if(temp == -1){
+                printf("\n");
+                return;
+            }
+            option = temp;
+        }
+
+        if (option == 2)
+        {
+            printf("case 2 : retry to assing new value like new mark or leave.\n");
+            printf("option: %d,mark: %c.\n",option,mark);
+            continue;
+        }else if (option == 1)
+        {
+            break; 
+        }
+        printf("-->>>please give the correct choice...<<<--\n");
+    } 
 }
 
 //----------------------------------------------------//
@@ -325,9 +364,7 @@ void game_start(game_info *gm){
             continue;
         }
 
-        index = get_index();
-
-        
+        index = get_index(); 
 
         if (index == -1)
         {
@@ -350,4 +387,76 @@ void game_start(game_info *gm){
 void game(char mark){
     game_info *gm = game_init(mark);//call form logic side to init game info.
     game_start(gm);// here is the actuale game loop.
+}
+
+int get_index_bot(const int *tab){
+    return bot_index(tab);
+}
+void game_start_solo(game_info *gm){
+    bool game_over = false;
+
+    bool is_bot_round;
+
+    if (gm->m->last_round == gm->m->bot)
+    {
+        is_bot_round = true;
+    }else{
+        is_bot_round = false;
+    }
+    
+    int eval;
+    int index;
+
+    while (!game_over)
+    {
+        printf("[-<player with %c round>-]",gm->m->last_round);
+        print_border(gm);
+
+        if (eval == 1)
+        {
+            char winner = (gm->m->last_round == gm->m->player)?gm->m->bot:gm->m->player;
+            int winner_num = (gm->m->last_round == gm->m->player)?2:1;
+            printf("->>>{player %d,with mark %c was win.}<<<-\n",winner_num,winner);
+
+            clean_up(gm);
+            game_over = true;
+            continue;  
+        }else if(eval == 0 && gm->empthy_count <= 0){
+            printf("->>>{draw,no ones win.}<<<-\n");
+
+            clean_up(gm);
+            game_over = true;
+            continue;
+        }
+
+        if (is_bot_round)
+        {
+            index = get_index_bot(gm->tab);
+            is_bot_round = false;
+        }else{
+            index = get_index();
+            is_bot_round = true;
+        }
+        
+        if (index == -1)
+        {
+            printf("\n");
+            return;
+        }
+
+        if(!set_mark(gm->m,gm->tab,index-1)){
+            continue;
+        }
+        
+        gm->empthy_count--;
+
+        eval = check_win(gm->tab);
+
+    }
+    
+}
+
+void game_solo(char mark){
+    game_info *gm = game_init(mark);
+    game_start_solo(gm);
 }

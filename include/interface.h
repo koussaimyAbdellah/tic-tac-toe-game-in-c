@@ -59,7 +59,15 @@ int read_mark(char *c);
 
 void game_start(game_info *gm);
 
+void game_start_solo(game_info *gm);
+
+void game_solo(char mark);
+
+void game(char mark);
+
 void print_border(game_info *gm);
 
 int get_index();
+
+int get_index_bot(const int *tab);
 #endif
