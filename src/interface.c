@@ -353,13 +353,13 @@ void game_start(game_info *gm){
             int winner_num = (gm->m->last_round == gm->m->player)?2:1;
             printf("->>>{player %d,with mark %c was win.}<<<-\n",winner_num,winner);
 
-            clean_up(gm);
+            clean_up(&gm);
             game_over = true;
             continue;  
         }else if(eval == 0 && gm->empthy_count <= 0){
             printf("->>>{draw,no ones win.}<<<-\n");
 
-            clean_up(gm);
+            clean_up(&gm);
             game_over = true;
             continue;
         }
@@ -392,6 +392,18 @@ void game(char mark){
 int get_index_bot(const int *tab){
     return bot_index(tab);
 }
+
+static void print_game_stats(game_info *gm,bool is_bot_round){
+    if (is_bot_round)
+        {
+            printf("[-bot with %c round>-]",gm->m->bot);
+        }else{
+            printf("[-<player with %c round>-]",gm->m->player);
+        }
+        
+        print_border(gm);
+}
+
 void game_start_solo(game_info *gm){
     bool game_over = false;
 
@@ -404,27 +416,30 @@ void game_start_solo(game_info *gm){
         is_bot_round = false;
     }
     
-    int eval;
+    int eval = -1;// just inint with any value for now 
     int index;
 
     while (!game_over)
     {
-        printf("[-<player with %c round>-]",gm->m->last_round);
-        print_border(gm);
+        print_game_stats(gm,is_bot_round);
 
         if (eval == 1)
         {
-            char winner = (gm->m->last_round == gm->m->player)?gm->m->bot:gm->m->player;
-            int winner_num = (gm->m->last_round == gm->m->player)?2:1;
-            printf("->>>{player %d,with mark %c was win.}<<<-\n",winner_num,winner);
+            if (gm->m->last_round == gm->m->player)
+            {
+                printf("->>>{bot,with mark %c was win.}<<<-\n",gm->m->bot);
 
-            clean_up(gm);
+            }else{
+                printf("->>>{player,with mark %c was win.}<<<-\n",gm->m->player);
+            }         
+
+            clean_up(&gm);
             game_over = true;
             continue;  
         }else if(eval == 0 && gm->empthy_count <= 0){
             printf("->>>{draw,no ones win.}<<<-\n");
 
-            clean_up(gm);
+            clean_up(&gm);
             game_over = true;
             continue;
         }
@@ -432,23 +447,36 @@ void game_start_solo(game_info *gm){
         if (is_bot_round)
         {   
             index = get_index_bot(gm->tab);
-            while (gm->tab[index] != EMPTHY)
-            {
-                index = get_index_bot(gm->tab);
-            }
+            // while (gm->tab[index] != EMPTHY)
+            // {
+            //     index = get_index_bot(gm->tab);
+            // }
+
             is_bot_round = false;
+
         }else{
-            index = get_index();
+
+            do{
+                index = get_index()-1;
+
+                if (index + 1 == -1)
+                {
+                    printf("\n");
+                    return;
+                }
+                print_game_stats(gm,is_bot_round);
+            }while (gm->tab[index] != EMPTHY);
+            
             is_bot_round = true;
         }
-        
-        if (index == -1)
-        {
-            printf("\n");
-            return;
-        }
 
-        if(!set_mark(gm->m,gm->tab,index-1)){
+        if (index + 1 == -1)
+            {
+                printf("\n");
+                return;
+            }
+
+        if(!set_mark(gm->m,gm->tab,index)){
             continue;
         }
         

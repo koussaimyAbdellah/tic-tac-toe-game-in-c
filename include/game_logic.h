@@ -41,6 +41,6 @@ game_info *game_init(char m);
 
 int check_win(const int *tab);
 
-void clean_up(game_info *gm);
+void clean_up(game_info **gm);
 
 #endif

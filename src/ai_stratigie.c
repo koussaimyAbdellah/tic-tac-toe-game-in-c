@@ -6,7 +6,7 @@ int bot_index(const int *tab){
     int index;
 
     do{ 
-            index = rand()%10;
+            index = rand()%9;
         
     }while (tab[index] != -1);
     return index;

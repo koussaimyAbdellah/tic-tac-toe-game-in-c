@@ -102,6 +102,12 @@ int set_mark_sp(marks* m,int *tab,int index,int *arr,int size){
 bool set_mark(marks* m,int *tab,int index){
     // set_mark_sp(m,tab,index,NULL,-1);
 
+        if (m == NULL || tab == NULL)
+        {
+            perror("invalid input: null pointer arguement\n.");
+            exit(1);
+        }
+        
         if (index>8 || index < 0)
         {
             fprintf(stderr,"invalid index: must be in withen range   0-9\n");
@@ -198,22 +204,17 @@ int check_win(const int *tab){
     return 0;
 }
 
-void clean_up(game_info *gm){
-    if (gm == NULL)
+void clean_up(game_info **gm){
+    if (gm == NULL || *gm == NULL)
     {
+        return;
+    }
+    
+    game_info *gg = *gm;
 
-        return;
-    }
-    if (gm->m == NULL)
-    {
-        return;
-    }
-    if (gm->tab == NULL)
-    {
-        return;
-    }
+    free(gg->m);
+    free(gg->tab);
+    free(gg);
 
-    free(gm->m);
-    free(gm->tab);
-    free(gm);
+    *gm = NULL;
 }

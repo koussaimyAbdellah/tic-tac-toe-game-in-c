@@ -44,5 +44,6 @@ clean:
 
 rebuild: clean all
 
-run: 
+run: bin/game
+	mkdir -p bin
 	bin/./game
