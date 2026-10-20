@@ -1,9 +1,8 @@
 #ifndef GAME_LOGIC_H
 #define GAME_LOGIC_H
 
+
 #include <stdbool.h>
-
-
 
 typedef struct choice_mark
 {
@@ -20,11 +19,17 @@ typedef enum{
     PLAYER = 0
 }round_whO;
 
+#define STRATIGIE_COUNT 4
+
+typedef int (*bot_move)(int *tab);
+
+
 typedef struct 
 {
     marks *m;
     int *tab;
     int empthy_count;
+    bot_move stratigie;
 }game_info;
 
 char first_to_start(marks* m);
@@ -37,7 +42,7 @@ int set_mark_sp(marks* m,int *tab,int index,int *arr,int size);
 
 bool set_mark(marks* m,int *tab,int index);
 
-game_info *game_init(char m);
+game_info *game_init(char m,int i);
 
 int check_win(const int *tab);
 

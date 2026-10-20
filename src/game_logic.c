@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "game_logic.h"
+#include "ai_stratigie.h"
 
 char first_to_start(marks* m){
     int index = rand()%2;
@@ -134,7 +135,7 @@ bool set_mark(marks* m,int *tab,int index){
         return true;
 }
 
-game_info *game_init(char m){
+game_info *game_init(char m,int i){
     game_info *new_game = malloc(sizeof(game_info));
     
     if (new_game == NULL)
@@ -144,7 +145,7 @@ game_info *game_init(char m){
     }
 
     marks *new_mark = create_choice_mark(m);
-
+    
     if (new_mark == NULL)
     {
         perror("allocation error: cannot allocat memroy for new_mark.\n");
@@ -159,6 +160,21 @@ game_info *game_init(char m){
         exit(1);
     }
 
+    if (i = -1)
+    {
+        new_game->stratigie = NULL;
+    }else{
+        bot_move *arr_st = malloc(sizeof(bot_move)*STRATIGIE_COUNT);
+        
+        arr_st[0] = bot_index_0;
+        arr_st[1] = bot_index_1;
+        arr_st[2] = bot_index_2;
+        arr_st[3] = bot_index_3;
+        arr_st[4] = bot_index_4;
+
+        new_game->stratigie = arr_st[i];
+    }
+    
     new_game->m = new_mark;
     new_game->tab = new_tab;
     new_game->empthy_count = 9;

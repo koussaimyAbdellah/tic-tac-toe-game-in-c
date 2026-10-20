@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "ai_stratigie.h"
 #include "interface.h"
 
@@ -145,10 +146,10 @@ static void read_mark_interface(char *m){
     }  
 }
 
-static int game_interface(int *option,char * mark,game_p g){
-            int op;
+static int game_interface(int option,char mark,gm_i *i){
+        int op;
 
-            while (true)
+        while (true)
             {
                 printf(">>==========<<\n");
                 printf(">>game start<<\n");
@@ -170,10 +171,13 @@ static int game_interface(int *option,char * mark,game_p g){
                 }
                 if (op == 1)
                 {
-                    /*printf("case 1: call game to play in multi player mode.\n");
-                    printf("option: %d,mark: %c.\n",*option,*mark);*/
-                    //this is the real game call from this callback we run the game.
-                    g(*mark);// callback
+                    if (i->diff == -1)
+                    {
+                        i->multi_player(mark);
+                    }else{
+                        i->solo(mark,i->diff);
+                    }
+
                     return op;
                 }else if(op == 2){
                     return op;
@@ -202,14 +206,28 @@ void interface1(){
         
         read_mark_interface(&mark);
 
-        
         if (option == 1)
         {
-            int temp = game_interface(&option,&mark,game);//interface connect loigc game whit user interface
+            gm_i *gmi = malloc(sizeof(gm_i));
+            gmi->multi_player = game;
+            gmi->diff = -1;
+            int temp = game_interface(option,mark,gmi);//interface connect loigc game whit user interface
             if(temp == -1){
+                if (gmi == NULL)
+                {
+                    fprintf(stderr,"null pointer.\n");
+                    exit(1);
+                }
+                free(gmi);
                 printf("\n");
                 return;
             }
+            if (gmi == NULL)
+                {
+                    fprintf(stderr,"null pointer.\n");
+                    exit(1);
+                }
+            free(gmi);
             option = temp;
         }
 
@@ -227,9 +245,51 @@ void interface1(){
 }
 //---------------------------------------------------------------//
 
+static int read_diffuclty_level_for_bot(){
+        
+        int diffuclty;
+
+        while (true)
+        {
+            printf(">>========<<\n");
+            printf(">>diffucly<<\n");
+            printf(">>========<<\n");
+            printf("-------------------------------------------------\n");
+            printf("choose bot diffuclty.\n");
+            printf("0-friendly(random moves.)\n");
+            printf("1-bigginer(just take the center from you.)\n");
+            printf("2-amateur(try to win agains you in some moves.)\n");
+            printf("3-mid-easy(do some effort agains you.)\n");
+            printf("4-mid(try to win in any move.)\n");
+            printf("-------------------------------------------------\n");
+
+            
+            int resl = read_input(&diffuclty);
+            if (resl == -1)
+            {
+                return -1;
+            } 
+
+            if (resl != 1)
+            {
+                printf("please give the correct option(number of option).\n");
+                continue;
+            } 
+            if (diffuclty<0 || diffuclty > 4)
+            {
+                printf("please give the correct option.\n");
+                continue;
+            }
+            break;
+        }
+        
+        return diffuclty;   
+}
+
 void interface2(){
     int option;
     char mark;
+    int diff;
 
     printf(">>>>>>>>>>>===========<<<<<<<<<<<\n");
     printf(">>     solo interface    <<\n");
@@ -245,15 +305,36 @@ void interface2(){
             break;
         }
         
+
         read_mark_interface(&mark);
 
+        diff = read_diffuclty_level_for_bot();
+        
+        
         if (option == 1)
         {
-            int temp = game_interface(&option,&mark,game_solo);//interface connect loigc game whit user interface
+            gm_i *gmi = malloc(sizeof(gm_i));
+            gmi->solo = game_solo;
+            gmi->diff = diff;
+            int temp = game_interface(option,mark,gmi);//interface connect loigc game whit user interface
             if(temp == -1){
+                if (gmi == NULL)
+                {
+                    fprintf(stderr,"null pointer.\n");
+                    exit(1);
+                }
+                free(gmi);
                 printf("\n");
                 return;
             }
+
+            if (gmi == NULL)
+            {
+                fprintf(stderr,"null pointer.\n");
+                exit(1);
+            }
+
+            free(gmi);
             option = temp;
         }
 
@@ -385,12 +466,12 @@ void game_start(game_info *gm){
 }
 
 void game(char mark){
-    game_info *gm = game_init(mark);//call form logic side to init game info.
+    game_info *gm = game_init(mark,-1);//call form logic side to init game info.
     game_start(gm);// here is the actuale game loop.
 }
 
 int get_index_bot(const int *tab){
-    return bot_index(tab);
+    return bot_index_0(tab);
 }
 
 static void print_game_stats(game_info *gm,bool is_bot_round){
@@ -403,92 +484,97 @@ static void print_game_stats(game_info *gm,bool is_bot_round){
         
         print_border(gm);
 }
-
-void game_start_solo(game_info *gm){
-    bool game_over = false;
-
-    bool is_bot_round;
-
+static bool check_who_start(game_info *gm){
     if (gm->m->last_round == gm->m->bot)
     {
-        is_bot_round = true;
-    }else{
-        is_bot_round = false;
+        return true;
     }
+    return false;
+}
+
+static void print_winner(game_info *gm){
+    if (gm->m->last_round == gm->m->player)
+    {
+        printf("->>>{bot,with mark %c was win.}<<<-\n",gm->m->bot);
+    }else
+    {
+        printf("->>>{player,with mark %c was win.}<<<-\n",gm->m->player);
+    }  
+}
+
+static bool check_winning_or_draw(game_info *gm,int eval){
+        if (eval == 1)
+        { 
+            print_winner(gm);
+            clean_up(&gm);
+            return true; 
+        }else if(eval == 0 && gm->empthy_count <= 0){
+            printf("->>>{draw,no ones win.}<<<-\n");
+            clean_up(&gm);
+            return true;
+        }
+        return false;
+}
+
+static int get_index_interface(game_info *gm,bool *bot){
+
+        int i;
+
+        if (*bot)
+        {   
+            i = get_index_bot(gm->tab);
+            *bot = false;
+        }else{
+            do{
+                i = get_index()-1;
+
+                if (i + 1 == -1)
+                {
+                    printf("\n");
+                    return -1;
+                }
+
+                print_game_stats(gm,bot);
+            }while (gm->tab[i] != EMPTHY);
+
+            *bot = true;
+        }
+        return i;
+}
+
+void game_start_solo(game_info *gm){
+
+    bool is_bot_round = check_who_start(gm);
     
     int eval = -1;// just inint with any value for now 
     int index;
 
-    while (!game_over)
+    while (true)
     {
         print_game_stats(gm,is_bot_round);
 
-        if (eval == 1)
+        if (check_winning_or_draw(gm,eval))
         {
-            if (gm->m->last_round == gm->m->player)
-            {
-                printf("->>>{bot,with mark %c was win.}<<<-\n",gm->m->bot);
-
-            }else{
-                printf("->>>{player,with mark %c was win.}<<<-\n",gm->m->player);
-            }         
-
-            clean_up(&gm);
-            game_over = true;
-            continue;  
-        }else if(eval == 0 && gm->empthy_count <= 0){
-            printf("->>>{draw,no ones win.}<<<-\n");
-
-            clean_up(&gm);
-            game_over = true;
-            continue;
+            break;
         }
+        
+        index = get_index_interface(gm,&is_bot_round);
 
-        if (is_bot_round)
-        {   
-            index = get_index_bot(gm->tab);
-            // while (gm->tab[index] != EMPTHY)
-            // {
-            //     index = get_index_bot(gm->tab);
-            // }
-
-            is_bot_round = false;
-
-        }else{
-
-            do{
-                index = get_index()-1;
-
-                if (index + 1 == -1)
-                {
-                    printf("\n");
-                    return;
-                }
-                print_game_stats(gm,is_bot_round);
-            }while (gm->tab[index] != EMPTHY);
-            
-            is_bot_round = true;
+        if (index == -1)
+        {
+            printf("\n");
+            return;
         }
-
-        if (index + 1 == -1)
-            {
-                printf("\n");
-                return;
-            }
-
-        if(!set_mark(gm->m,gm->tab,index)){
-            continue;
-        }
+        
+        while(!set_mark(gm->m,gm->tab,index));
         
         gm->empthy_count--;
 
         eval = check_win(gm->tab);
-
-    }
-    
+    } 
 }
 
-void game_solo(char mark){
-    game_info *gm = game_init(mark);
+void game_solo(char mark,int diff){
+    game_info *gm = game_init(mark,diff);
     game_start_solo(gm);
 }

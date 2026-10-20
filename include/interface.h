@@ -5,6 +5,15 @@
 
 typedef void (*interface)();
 typedef void (*game_p)(char);
+typedef void (*game_pp)(char,int);
+
+typedef struct 
+{
+    game_p multi_player;
+    game_pp solo;
+    int diff;
+}gm_i;
+
 
 /**
  * main user interface,here is where we move to other interface
@@ -61,7 +70,7 @@ void game_start(game_info *gm);
 
 void game_start_solo(game_info *gm);
 
-void game_solo(char mark);
+void game_solo(char mark,int i);
 
 void game(char mark);
 
