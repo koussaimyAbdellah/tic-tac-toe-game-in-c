@@ -108,7 +108,7 @@ bool set_mark(marks* m,int *tab,int index){
             return false;
         }
         
-        if (tab[index] != -1)
+        if (tab[index] != EMPTHY)
         {
             fprintf(stderr,"invalid index: you need to chose unocupped place.\n");
             return false;

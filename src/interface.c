@@ -430,8 +430,12 @@ void game_start_solo(game_info *gm){
         }
 
         if (is_bot_round)
-        {
+        {   
             index = get_index_bot(gm->tab);
+            while (gm->tab[index] != EMPTHY)
+            {
+                index = get_index_bot(gm->tab);
+            }
             is_bot_round = false;
         }else{
             index = get_index();
