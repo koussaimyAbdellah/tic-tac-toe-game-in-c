@@ -78,5 +78,5 @@ void print_border(game_info *gm);
 
 int get_index();
 
-int get_index_bot(const int *tab);
+int get_index_bot(game_info *gm);
 #endif

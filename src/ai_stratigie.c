@@ -4,20 +4,22 @@
 
 int bot_index_0(const int *tab){
     int index;
-
-    do{ 
-            index = rand()%9;
-        
+    do{
+        index = rand()%9;
     }while (tab[index] != EMPTHY);
     return index;
 }
 
 int bot_index_1(const int *tab){
+    int index;
     if (tab[4] == EMPTHY)
     {
         return 4;
     }
-    return bot_index_0(tab);
+    do{
+        index = rand()%9;
+    }while (tab[index] != EMPTHY);
+    return index;
 }
 
 int bot_index_2(const int *tab){

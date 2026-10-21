@@ -466,12 +466,12 @@ void game_start(game_info *gm){
 }
 
 void game(char mark){
-    game_info *gm = game_init(mark,-1);//call form logic side to init game info.
+    game_info *gm = game_init(mark,-1,NULL);//call form logic side to init game info.
     game_start(gm);// here is the actuale game loop.
 }
 
-int get_index_bot(const int *tab){
-    return bot_index_0(tab);
+int get_index_bot(game_info *gm){
+    return gm->stratigie(gm->tab);
 }
 
 static void print_game_stats(game_info *gm,bool is_bot_round){
@@ -522,7 +522,7 @@ static int get_index_interface(game_info *gm,bool *bot){
 
         if (*bot)
         {   
-            i = get_index_bot(gm->tab);
+            i = get_index_bot(gm);
             *bot = false;
         }else{
             do{
@@ -575,6 +575,26 @@ void game_start_solo(game_info *gm){
 }
 
 void game_solo(char mark,int diff){
-    game_info *gm = game_init(mark,diff);
+    bot_move *arr_st = create_stratigie_bot();
+
+    if (arr_st == NULL)
+    {
+        fprintf(stderr,"invalid pointer: null pointer.\n");
+        exit(1);
+    }
+    
+    game_info *gm = game_init(mark,diff,arr_st);
+
+    if (arr_st == NULL)
+    {
+        fprintf(stderr,"invalid pointer: null pointer.\n");
+        exit(1);
+    }
+    
+    
+
     game_start_solo(gm);
+    
+    free(arr_st);
+    arr_st = NULL;
 }

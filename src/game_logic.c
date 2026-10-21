@@ -135,7 +135,24 @@ bool set_mark(marks* m,int *tab,int index){
         return true;
 }
 
-game_info *game_init(char m,int i){
+ bot_move *create_stratigie_bot(){
+        bot_move *arr_st = malloc(sizeof(bot_move)*STRATIGIE_COUNT);
+        
+        if (arr_st == NULL)
+        {
+            fprintf(stderr,"memory allocaton failded for array stratigie bot");
+            exit(1);
+        }
+        
+        arr_st[0] = bot_index_0;
+        arr_st[1] = bot_index_1;
+        arr_st[2] = bot_index_2;
+        arr_st[3] = bot_index_3;
+        arr_st[4] = bot_index_4;
+        
+        return arr_st;
+    }
+game_info *game_init(char m,int i,bot_move *arr_st){
     game_info *new_game = malloc(sizeof(game_info));
     
     if (new_game == NULL)
@@ -163,16 +180,8 @@ game_info *game_init(char m,int i){
     if (i = -1)
     {
         new_game->stratigie = NULL;
-    }else{
-        bot_move *arr_st = malloc(sizeof(bot_move)*STRATIGIE_COUNT);
-        
-        arr_st[0] = bot_index_0;
-        arr_st[1] = bot_index_1;
-        arr_st[2] = bot_index_2;
-        arr_st[3] = bot_index_3;
-        arr_st[4] = bot_index_4;
-
-        new_game->stratigie = arr_st[i];
+    }else{ 
+        new_game->stratigie = arr_st[i]; 
     }
     
     new_game->m = new_mark;

@@ -21,7 +21,7 @@ typedef enum{
 
 #define STRATIGIE_COUNT 4
 
-typedef int (*bot_move)(int *tab);
+typedef int (*bot_move)(const int *tab);
 
 
 typedef struct 
@@ -42,7 +42,9 @@ int set_mark_sp(marks* m,int *tab,int index,int *arr,int size);
 
 bool set_mark(marks* m,int *tab,int index);
 
-game_info *game_init(char m,int i);
+game_info *game_init(char m,int i,bot_move * arr_st);
+
+bot_move *create_stratigie_bot();
 
 int check_win(const int *tab);
 
