@@ -136,6 +136,7 @@ bool set_mark(marks* m,int *tab,int index){
 }
 
  bot_move *create_stratigie_bot(){
+
         bot_move *arr_st = malloc(sizeof(bot_move)*STRATIGIE_COUNT);
         
         if (arr_st == NULL)
@@ -149,7 +150,7 @@ bool set_mark(marks* m,int *tab,int index){
         arr_st[2] = bot_index_2;
         arr_st[3] = bot_index_3;
         arr_st[4] = bot_index_4;
-        
+
         return arr_st;
     }
 game_info *game_init(char m,int i,bot_move *arr_st){
@@ -177,7 +178,7 @@ game_info *game_init(char m,int i,bot_move *arr_st){
         exit(1);
     }
 
-    if (i = -1)
+    if (i == -1)
     {
         new_game->stratigie = NULL;
     }else{ 

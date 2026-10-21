@@ -559,15 +559,16 @@ void game_start_solo(game_info *gm){
         }
         
         index = get_index_interface(gm,&is_bot_round);
-
+     
         if (index == -1)
         {
             printf("\n");
             return;
         }
         
+       
         while(!set_mark(gm->m,gm->tab,index));
-        
+
         gm->empthy_count--;
 
         eval = check_win(gm->tab);
@@ -582,19 +583,11 @@ void game_solo(char mark,int diff){
         fprintf(stderr,"invalid pointer: null pointer.\n");
         exit(1);
     }
-    
+
     game_info *gm = game_init(mark,diff,arr_st);
 
-    if (arr_st == NULL)
-    {
-        fprintf(stderr,"invalid pointer: null pointer.\n");
-        exit(1);
-    }
-    
-    
-
     game_start_solo(gm);
-    
+
     free(arr_st);
     arr_st = NULL;
 }
