@@ -575,6 +575,8 @@ void game_start_solo(game_info *gm){
     } 
 }
 
+bool bot_init_value = true;
+
 void game_solo(char mark,int diff){
     bot_move *arr_st = create_stratigie_bot();
 
@@ -588,6 +590,11 @@ void game_solo(char mark,int diff){
 
     game_start_solo(gm);
 
+    if (!bot_init_value)
+    {
+        bot_init_value = true;
+    }
+    
     free(arr_st);
     arr_st = NULL;
 }

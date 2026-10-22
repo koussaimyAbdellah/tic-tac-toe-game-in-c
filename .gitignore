@@ -3,4 +3,5 @@ build/
 bin/
 *.sh
 *.md
+*.d
 test/

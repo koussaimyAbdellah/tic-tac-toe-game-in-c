@@ -10,4 +10,7 @@ int bot_index_2(const int *tab);
 int bot_index_3(const int *tab);
 
 int bot_index_4(const int *tab);
+
+//int bot_index_5(const int *tab);
+
 #endif
