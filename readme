@@ -29,3 +29,17 @@ its work on console interface whit two modes:
     this mode is where you play with your friend in same place so have fun .
 
 you just need to chosse your mark and start play then if the one how one will print it and show the border with colored winning line.
+
+# how to use or test the game
+
+you can run the game form desktop launcher by run does command.
+
+```bach
+    #this will run install.sh that create required set up
+    #run chmod +x install.sh to make it executable
+    make install
+
+    #this is unistall the app entierly 
+    #make sure that you run chmod+x unistall.sh
+    make unistall 
+```
