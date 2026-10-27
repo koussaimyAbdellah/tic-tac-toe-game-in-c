@@ -40,7 +40,7 @@ build/ai_stratigie.o: src/ai_stratigie.c include/ai_stratigie.h include/game_log
 # 	mkdir -p build/test/
 # 	gcc  test/test_game.c -c -o build/test/test_game.o
 #-----------------------------------------------------------------#
-.phony: clean run rebuild all 
+.PHONY: clean run rebuild all
 
 all: bin/game
 

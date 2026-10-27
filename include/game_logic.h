@@ -20,7 +20,7 @@ typedef enum{
     PLAYER = 0
 }round_whO;
 
-#define STRATIGIE_COUNT 4
+#define STRATIGIE_COUNT 5
 
 typedef int (*bot_move)(const int *tab);
 typedef int (*bot_move5)(const int *tab,bot_info *b);

@@ -115,11 +115,20 @@ static int find_tactical_move(const int tab[9], bot_info *b, int mark)
 
 
 int bot_index_0(const int *tab){
-    int index;
-    do{
-        index = rand()%9;
-    }while (tab[index] != EMPTHY);
-    return index;
+    int empty[9];
+    int count = 0;
+
+    if (tab == NULL) {
+        return -1;
+    }
+
+    for (int i = 0; i < 9; i++) {
+        if (tab[i] == EMPTHY) {
+            empty[count++] = i;
+        }
+    }
+
+    return count == 0 ? -1 : empty[rand() % count];
 }
 
 int bot_index_1(const int *tab){
@@ -155,7 +164,7 @@ int bot_index_2(const int *tab){
         }
         
 
-        int requiested_index;
+        int requiested_index = -1;
 
         int win_arr[9][3] = {{0,1,2},{3,4,5},{6,7,8},{0,3,6},{1,4,7},{2,5,8},{0,4,8},{6,4,2}};
         int size_arr = sizeof(win_arr)/sizeof(win_arr[0][0]);
@@ -179,7 +188,7 @@ int bot_index_2(const int *tab){
             }
         }
 
-        if (tab[requiested_index] != EMPTHY)
+        if (requiested_index == -1 || tab[requiested_index] != EMPTHY)
         {
             requiested_index = index;
         }
@@ -209,14 +218,13 @@ int bot_index_3(const int *tab){
                return 4;
             }else{
                 int conner_arr[4] = {0,2,6,8};
-                int conren_index;
-
-                do{
-                 conren_index = rand()%4;
-
-                }while(tab[conner_arr[conren_index]] != -1);
-                index = conner_arr[conren_index];
-                return index;
+                for (int i = 0; i < 4; i++) {
+                    int conren_index = rand()%4;
+                    if (tab[conner_arr[conren_index]] == EMPTHY) {
+                        return conner_arr[conren_index];
+                    }
+                }
+                return bot_index_0(tab);
             }
         }else if (count == 1)
         {
@@ -226,16 +234,13 @@ int bot_index_3(const int *tab){
             }else{
 
                 int conner_arr[4] = {0,2,6,8};
-                int conren_index;
-
-                do{
-                 conren_index = rand()%4;
-
-                }while(tab[conner_arr[conren_index]] != -1);
-
-                index = conner_arr[conren_index];
-    
-                return index;
+                for (int i = 0; i < 4; i++) {
+                    int conren_index = rand()%4;
+                    if (tab[conner_arr[conren_index]] == EMPTHY) {
+                        return conner_arr[conren_index];
+                    }
+                }
+                return bot_index_0(tab);
             }
         }else if (count == 2)
         {
@@ -275,14 +280,13 @@ int bot_index_4(const int *tab){
             }else{
 
                 int conner_arr[4] = {0,2,6,8};
-                int conren_index;
-
-                {
-                 conren_index = rand()%4;
-                }while(tab[conner_arr[conren_index]] != -1);
-
-                index = conner_arr[conren_index];
-                return index;
+                for (int i = 0; i < 4; i++) {
+                    int conren_index = rand()%4;
+                    if (tab[conner_arr[conren_index]] == EMPTHY) {
+                        return conner_arr[conren_index];
+                    }
+                }
+                return bot_index_0(tab);
             }
         }else if (count == 1)
         {
@@ -293,7 +297,7 @@ int bot_index_4(const int *tab){
                 if (count_player == 1)
                 {
                     do{ 
-                    index = rand()%10;
+                    index = rand()%9;
                     }while (tab[index] != -1);
                     return index;
                 }

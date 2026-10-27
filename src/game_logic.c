@@ -10,10 +10,7 @@ char first_to_start(marks* m){
     if(index == 0){
         return m->player;
     }
-    if (index == 1)
-    {
-        return m->bot;
-    }
+    return m->bot;
 }
 
 marks*  create_choice_mark(char c){
@@ -41,10 +38,17 @@ marks*  create_choice_mark(char c){
             new_mark->last_round = new_mark->first_start;
             return new_mark;
         }
-    } 
+    free(new_mark);
+    return NULL;
+}
 
 int* init_table(){
     int* table_game = malloc(sizeof(int)*9);
+
+    if (table_game == NULL)
+    {
+        return NULL;
+    }
 
     for (int i = 0; i < 9; i++)
     {
@@ -94,10 +98,10 @@ int set_mark_sp(marks* m,int *tab,int index,int *arr,int size){
             arr[size] = index;
            
         } 
-        return size++;
+        return size + 1;
     }
-    
-    
+
+    return 0;
 }
 
 bool set_mark(marks* m,int *tab,int index){
@@ -171,7 +175,7 @@ game_info *game_init(char m,int i,bot_move *arr_st){
         exit(1);
     }
 
-    int *new_tab = init_table(new_mark);
+    int *new_tab = init_table();
 
     if (new_tab == NULL)
     {
@@ -189,6 +193,8 @@ game_info *game_init(char m,int i,bot_move *arr_st){
     new_game->m = new_mark;
     new_game->tab = new_tab;
     new_game->empthy_count = 9;
+    new_game->move = NULL;
+    new_game->b = NULL;
 
     return new_game;
 }
@@ -210,7 +216,7 @@ game_info *game_init_5(char m,bot_move5 move){
         exit(1);
     }
 
-    int *new_tab = init_table(new_mark);
+    int *new_tab = init_table();
 
     if (new_tab == NULL)
     {
@@ -223,11 +229,18 @@ game_info *game_init_5(char m,bot_move5 move){
     new_game->m = new_mark;
     new_game->tab = new_tab;
     new_game->empthy_count = 9;
+    new_game->stratigie = NULL;
+    new_game->b = NULL;
 
     return new_game;
 }
 
 int check_win(const int *tab){
+    if (tab == NULL)
+    {
+        return 0;
+    }
+
     for (int i = 0; i < 3; i++)
     {
         if (tab[i] == tab[i+3] && tab[i] == tab[i+6])

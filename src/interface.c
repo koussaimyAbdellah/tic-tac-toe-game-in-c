@@ -32,12 +32,15 @@ int read_mark(char *c){
     if (ch == 'x' || ch == 'X')
     {
         *c = ch;
+        flush_line();
         return 1;
     }else if (ch == 'o' || ch == 'O')
     {
         *c = ch;
+        flush_line();
         return 1;
     }else{
+        flush_line();
         return 0;
     } 
 }
@@ -110,6 +113,7 @@ static void read_option_interface(int *op){
 
             if (res == -1)
             {
+                *op = 0;
                 printf("\n");
                 return;
             }
@@ -122,7 +126,7 @@ static void read_option_interface(int *op){
             return;
     } 
 }
-
+ 
 static void read_mark_interface(char *m){
     while (true)
     {
@@ -134,6 +138,7 @@ static void read_mark_interface(char *m){
         
         if (res == -1)
         {
+            *m = '\0';
             printf("\n");
             return;
         }
@@ -209,24 +214,19 @@ void interface1(){
         if (option == 1)
         {
             gm_i *gmi = malloc(sizeof(gm_i));
+            if (gmi == NULL)
+            {
+                perror("cannot allocate interface state");
+                exit(EXIT_FAILURE);
+            }
             gmi->multi_player = game;
             gmi->diff = -1;
             int temp = game_interface(option,mark,gmi);//interface connect loigc game whit user interface
             if(temp == -1){
-                if (gmi == NULL)
-                {
-                    fprintf(stderr,"null pointer.\n");
-                    exit(1);
-                }
                 free(gmi);
                 printf("\n");
                 return;
             }
-            if (gmi == NULL)
-                {
-                    fprintf(stderr,"null pointer.\n");
-                    exit(1);
-                }
             free(gmi);
             option = temp;
         }
@@ -314,24 +314,18 @@ void interface2(){
         if (option == 1)
         {
             gm_i *gmi = malloc(sizeof(gm_i));
+            if (gmi == NULL)
+            {
+                perror("cannot allocate interface state");
+                exit(EXIT_FAILURE);
+            }
             gmi->solo = game_solo;
             gmi->diff = diff;
             int temp = game_interface(option,mark,gmi);//interface connect loigc game whit user interface
             if(temp == -1){
-                if (gmi == NULL)
-                {
-                    fprintf(stderr,"null pointer.\n");
-                    exit(1);
-                }
                 free(gmi);
                 printf("\n");
                 return;
-            }
-
-            if (gmi == NULL)
-            {
-                fprintf(stderr,"null pointer.\n");
-                exit(1);
             }
 
             free(gmi);
@@ -450,6 +444,7 @@ void game_start(game_info *gm){
         if (index == -1)
         {
             printf("\n");
+            clean_up(&gm);
             return;
         }
 
@@ -574,11 +569,16 @@ void game_start_solo(game_info *gm){
         if (index == -1)
         {
             printf("\n");
+            clean_up(&gm);
             return;
         }
         
        
-        while(!set_mark(gm->m,gm->tab,index));
+        if (!set_mark(gm->m,gm->tab,index)) {
+            printf("invalid bot move.\n");
+            clean_up(&gm);
+            return;
+        }
 
         gm->empthy_count--;
 
@@ -651,7 +651,7 @@ void game_solo(char mark,int diff){
     }
     
     game_info *gm;
-    bot_info *bi;
+    bot_info *bi = NULL;
 
     if (diff == 5)
     {
@@ -659,7 +659,7 @@ void game_solo(char mark,int diff){
 
         gm = game_init_5(mark,bot_index_5);
 
-        if (gm->m->bot = gm->m->last_round)
+        if (gm->m->bot == gm->m->last_round)
         {
             bi->bot_init_value = true;
         }else{
@@ -670,8 +670,17 @@ void game_solo(char mark,int diff){
         gm = game_init(mark,diff,arr_st);
     }  
 
+    if (diff == 5)
+    {
+        gm->b = bi;
+    }
+
     game_start_solo(gm);
 
-    free(bi);
+    if (diff == 5)
+    {
+        free(bi->arr_element);
+        free(bi);
+    }
     free(arr_st);
 }
