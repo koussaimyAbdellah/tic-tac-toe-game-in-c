@@ -23,24 +23,7 @@ build/game_logic.o: src/game_logic.c include/game_logic.h
 build/ai_stratigie.o: src/ai_stratigie.c include/ai_stratigie.h include/game_logic.h
 	mkdir -p build
 	gcc -Iinclude -MMD -MP src/ai_stratigie.c -c -o build/ai_stratigie.o
-#------------------------------------------------------------------#
-# bin/test/game_test: build/test/game_logic.o build/test/interface.o build/test/test_game.o 
-# 	mkdir -p bin/test/
-# 	gcc -Iinclude build/test/*.o -o game_test
-
-# build/test/game_logic.o: src/game_logic.c 
-# 	mkdir -p build/test/
-# 	gcc -Iinclude src/game_logic.c -c -o build/test/game_logic.o
-
-# build/test/interface.o: src/interface.c 
-# 	mkdir -p build/test/
-# 	gcc -Iinclude src/interface.c -c -o build/test/interface.o
-
-# build/test/test_game.o: test/test_game.c 
-# 	mkdir -p build/test/
-# 	gcc  test/test_game.c -c -o build/test/test_game.o
-#-----------------------------------------------------------------#
-.PHONY: clean run rebuild all
+.PHONY: clean run rebuild release all
 
 all: bin/game
 
@@ -52,3 +35,7 @@ rebuild: clean all
 run: bin/game
 	mkdir -p bin
 	bin/./game
+
+release:
+	mkdir -p bin/release
+	gcc -std=c11 -O2 -DNDEBUG -Iinclude src/main.c src/interface.c src/game_logic.c src/ai_stratigie.c -o bin/release/game

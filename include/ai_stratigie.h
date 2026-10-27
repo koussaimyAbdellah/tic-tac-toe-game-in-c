@@ -33,4 +33,8 @@ int bot_index_4(const int *tab);
 
 int bot_index_5(const int *tab,bot_info *b);
 
+int bot_index_6(const int *tab);
+
+void reset_bot_index_6(void);
+
 #endif

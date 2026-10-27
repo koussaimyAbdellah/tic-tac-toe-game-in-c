@@ -105,8 +105,6 @@ int set_mark_sp(marks* m,int *tab,int index,int *arr,int size){
 }
 
 bool set_mark(marks* m,int *tab,int index){
-    // set_mark_sp(m,tab,index,NULL,-1);
-
         if (m == NULL || tab == NULL)
         {
             perror("invalid input: null pointer arguement\n.");
@@ -154,6 +152,7 @@ bool set_mark(marks* m,int *tab,int index){
         arr_st[2] = bot_index_2;
         arr_st[3] = bot_index_3;
         arr_st[4] = bot_index_4;
+        arr_st[6] = bot_index_6;
 
         return arr_st;
     }

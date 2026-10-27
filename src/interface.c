@@ -4,15 +4,12 @@
 #include "ai_stratigie.h"
 #include "interface.h"
 
-//-----------------------------------------------------------------------//
-/*====================================*/
 static void flush_line(void) {          
     int c = getchar();
     while (c != '\n' && c != EOF) {
         c = getchar();
     }
     }
-/*====================================*/
 int read_input(int *var) {    
     int res = scanf("%d", var);
     if (res == EOF) {
@@ -44,7 +41,6 @@ int read_mark(char *c){
         return 0;
     } 
 }
-//-----------------------------------------------------------------//
 void interface0(interface i1,interface i2){
     int choice_main;
 
@@ -98,8 +94,6 @@ void interface0(interface i1,interface i2){
         }
     }
 }
-//--------------------------------------------------------------------------//
-
 static void read_option_interface(int *op){
     while (true)
     {
@@ -201,7 +195,7 @@ void interface1(){
 
     while (true)
     {
-        read_option_interface(&option);//an interface to read option with options.
+        read_option_interface(&option);
         
         if (option == 0)
         {
@@ -221,7 +215,7 @@ void interface1(){
             }
             gmi->multi_player = game;
             gmi->diff = -1;
-            int temp = game_interface(option,mark,gmi);//interface connect loigc game whit user interface
+            int temp = game_interface(option,mark,gmi);
             if(temp == -1){
                 free(gmi);
                 printf("\n");
@@ -243,8 +237,6 @@ void interface1(){
         printf("-->>>please give the correct choice...<<<--\n");
     }
 }
-//---------------------------------------------------------------//
-
 static int read_diffuclty_level_for_bot(){
         
         int diffuclty;
@@ -262,6 +254,7 @@ static int read_diffuclty_level_for_bot(){
             printf("3-mid-easy(do some effort agains you.)\n");
             printf("4-mid(try to win in any move.)\n");
             printf("5- mid-hard.\n");
+            printf("6- hard.\n");
             printf("-------------------------------------------------\n");
 
             int resl = read_input(&diffuclty);
@@ -275,7 +268,7 @@ static int read_diffuclty_level_for_bot(){
                 printf("please give the correct option(number of option).\n");
                 continue;
             } 
-            if (diffuclty<0 || diffuclty > 5)
+            if (diffuclty<0 || diffuclty > 6)
             {
                 printf("please give the correct option.\n");
                 continue;
@@ -321,7 +314,7 @@ void interface2(){
             }
             gmi->solo = game_solo;
             gmi->diff = diff;
-            int temp = game_interface(option,mark,gmi);//interface connect loigc game whit user interface
+            int temp = game_interface(option,mark,gmi);
             if(temp == -1){
                 free(gmi);
                 printf("\n");
@@ -344,8 +337,6 @@ void interface2(){
         printf("-->>>please give the correct choice...<<<--\n");
     } 
 }
-
-//----------------------------------------------------//
 
 void print_border(game_info *gm){
     int bn = 2;
@@ -461,8 +452,8 @@ void game_start(game_info *gm){
 }
 
 void game(char mark){
-    game_info *gm = game_init(mark,-1,NULL);//call form logic side to init game info.
-    game_start(gm);// here is the actuale game loop.
+    game_info *gm = game_init(mark,-1,NULL);
+    game_start(gm);
 }
 
 int get_index_bot(game_info *gm){
@@ -552,7 +543,7 @@ void game_start_solo(game_info *gm){
 
     bool is_bot_round = check_who_start(gm);
     
-    int eval = -1;// just inint with any value for now 
+    int eval = -1;
     int index;
 
     while (true)
@@ -622,7 +613,6 @@ bot_info* create_bot_info(){
     }
     b->size_e = 3;
 
-    //static
     int corner[4] = {0,2,6,8};
     int empthy_case[5] = {1,3,4,5,7};
 
@@ -653,6 +643,11 @@ void game_solo(char mark,int diff){
     game_info *gm;
     bot_info *bi = NULL;
 
+    if (diff == 6)
+    {
+        reset_bot_index_6();
+    }
+
     if (diff == 5)
     {
         bi = create_bot_info();
@@ -681,6 +676,10 @@ void game_solo(char mark,int diff){
     {
         free(bi->arr_element);
         free(bi);
+    }
+    if (diff == 6)
+    {
+        reset_bot_index_6();
     }
     free(arr_st);
 }
