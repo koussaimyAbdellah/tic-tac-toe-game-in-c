@@ -2,37 +2,117 @@
 #include "game_logic.h"
 #include "ai_stratigie.h"
 
-static bool check_win_in(int arr[9][3],const int size,const int *arr_e){
-    for (int i = 0; i < size; i++)
-    {
-        int y =0;
-        while (y < 3)
-        {
-            bool is_equal = false;
 
-            for (int j = 0; j < 3; j++)
-            {
-                if (arr_e[y] == arr[i][j])
-                {
-                    is_equal = true;
+static bool check_win_in(int arr[][3], int size, const int *arr_e, int arr_size)
+{
+    /* A winning line must contain exactly three distinct board positions. */
+    if (arr == NULL || arr_e == NULL || size <= 0 || arr_size != 3) {
+        return false;
+    }
+
+    if (arr_e[0] == arr_e[1] ||
+        arr_e[0] == arr_e[2] ||
+        arr_e[1] == arr_e[2]) {
+        return false;
+    }
+
+    for (int i = 0; i < size; i++) {
+        bool all_found = true;
+
+        for (int k = 0; k < arr_size; k++) {
+            bool found = false;
+
+            for (int j = 0; j < 3; j++) {
+                if (arr_e[k] == arr[i][j]) {
+                    found = true;
                     break;
                 }
-            } 
+            }
 
-            if (is_equal)
-            {
-                y++;
-            }else{
+            if (!found) {
+                all_found = false;
                 break;
-            }  
+            }
         }
-        if (y == 3)
-        {
+
+        if (all_found) {
             return true;
         }
     }
+
     return false;
 }
+
+static int choose_empty_corner(const int tab[9], const bot_info *b)
+{
+    int available[4];
+    int count = 0;
+
+    for (int i = 0; i < b->counter_corner && i < 4; i++) {
+        int square = b->corner[i];
+
+        if (square >= 0 && square < 9 && tab[square] == EMPTHY) {
+            available[count++] = square;
+        }
+    }
+
+    if (count == 0) {
+        return -1;
+    }
+
+    return available[rand() % count];
+}
+
+static int choose_empty_square(const int tab[9])
+{
+    for (int i = 0; i < 9; i++) {
+        if (tab[i] == EMPTHY) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+static int find_tactical_move(const int tab[9], bot_info *b, int mark)
+{
+    int marks[9];
+    int mark_count = 0;
+
+    for (int i = 0; i < 9; i++) {
+        if (tab[i] == mark) {
+            marks[mark_count++] = i;
+        }
+    }
+
+    for (int a = 0; a < mark_count; a++) {
+        for (int c = a + 1; c < mark_count; c++) {
+            for (int move = 0; move < 9; move++) {
+                if (tab[move] != EMPTHY) {
+                    continue;
+                }
+
+                /* Every valid winning line has an index sum divisible by 3. */
+                if ((marks[a] + marks[c] + move) % 3 != 0) {
+                    continue;
+                }
+
+                b->arr_element[0] = marks[a];
+                b->arr_element[1] = marks[c];
+                b->arr_element[2] = move;
+                b->size_e = 3;
+
+                if (check_win_in(b->win_arr, b->size_a,
+                                 b->arr_element, b->size_e)) {
+                    return move;
+                }
+            }
+        }
+    }
+
+    return -1;
+}
+
 
 int bot_index_0(const int *tab){
     int index;
@@ -69,7 +149,7 @@ int bot_index_2(const int *tab){
         if (count < 2)
         {
             return index;
-        }else if (count > 3)
+        }else if (count > 2)
         {
             return index;
         }
@@ -90,8 +170,8 @@ int bot_index_2(const int *tab){
                         element_arr[0] = bot_indexs[0];
                         element_arr[1] = bot_indexs[1];
                         element_arr[2] = i;
-                        
-                        if (check_win_in(win_arr,size_arr,element_arr))
+
+                        if (check_win_in(win_arr,size_arr,element_arr,3))
                         {
                             requiested_index = i;
                         }
@@ -175,12 +255,12 @@ int bot_index_4(const int *tab){
 
         for (int i = 0; i < 9; i++)
         {
-            if (tab[i] == 1)
+            if (tab[i] == BOT)
             {
                 bot_indexs[count] = i;
                 count++;
             }
-            if (tab[i] == 0)
+            if (tab[i] == PLAYER)
             {
                 player_indexs[count_player] = i;
                 count_player++;
@@ -226,565 +306,67 @@ int bot_index_4(const int *tab){
         }
     return bot_index_0(tab);
 }
-/*
-int bot_index_5(const int *tab){
-    int bot_marks[5];
-    int player_marks[5];
-    int corner[4] = {0,2,6,8};
-    int counter_corner = 3;
-    int base = 4;
 
-    int sum_player = 0;
-    int sum_bot = 0;
+int bot_index_5(const int tab[9], bot_info *b)
+{
+    if (tab == NULL || b == NULL || b->arr_element == NULL) {
+        return -1;
+    }
 
     int count_bot = 0;
     int count_player = 0;
+    int first_player_mark = -1;
 
-    bool bot_i = false;
-    for (int i = 0; i < 9; i++)
-    {
-        if (tab[i] != BOT)
-        {
-            bot_marks[count_bot] = i;
+    for (int i = 0; i < 9; i++) {
+        if (tab[i] == BOT) {
             count_bot++;
-        }else if (tab[i] != PLAYER)
-        {
-            player_marks[count_player] = i;
+        } else if (tab[i] == PLAYER) {
+            if (first_player_mark == -1) {
+                first_player_mark = i;
+            }
             count_player++;
         }
     }
 
-    if (bot_init_value )
-    {
-        if (count_bot > count_player)
-        {
-            bot_i = true;
-        }else{
-            bot_i = false;
-        }  
+    if (count_bot == 0 && tab[4] == EMPTHY) {
+        return 4;
     }
 
-    if (bot_i){      
-            if (count_bot == 0)
-            {
-                return 4;   
-                sum_bot += 4;
-            }else if (count_bot == 1)
-            {
-                //take  corner 
-                //-------------------------------------------------------//
-                int index_corner = rand()%base;
+    if (b->bot_init_value && count_bot == 1 && tab[4] == BOT) {
+        int opposite_corner = -1;
 
-                int requiested_index;
+        switch (first_player_mark) {
+            case 0: opposite_corner = 8; break;
+            case 2: opposite_corner = 6; break;
+            case 6: opposite_corner = 2; break;
+            case 8: opposite_corner = 0; break;
+            default: break;
+        }
 
-                if ((player_marks[count_player-1]+4+corner[index_corner])%3 == 0)
-                    {
-                        element_arr[0] = bot_marks[0];
-                        element_arr[1] = bot_marks[1];
-                        element_arr[2] = i;
-                        if (check_win_in())
-                        {
-                            
-                        }
-                        
-                        for (int i = index_corner; i < counter_corner; i++)
-                        {
-                            corner[i] = corner[i+1];
-                        }
-                        corner[counter_corner] = -1;
-                        counter_corner--;
-                        base--;
-                        int temp ;
-                        for (int i = 0; i < counter_corner; i++)
-                        {
-                            if (player_marks[count_player-1]==corner[i])
-                            {
-                                temp = i;
-                                break;
-                            }
-                        }
-                        for (int i = temp; i < count_player; i++)
-                        {
-                            corner[i] = corner[i+1];
-                        }
-                        corner[counter_corner-1] = -1;
-                        counter_corner--;
-                        base--;    
-                    }
+        if (opposite_corner != -1 && tab[opposite_corner] == EMPTHY) {
+            return opposite_corner;
+        }
 
-                    index_corner = rand()%base;
+        int corner = choose_empty_corner(tab, b);
+        if (corner != -1) {
+            return corner;
+        }
+    }
 
-                while (tab[corner[index_corner]] != -1)
-                {
-                    index_corner = rand()%base;
-                    
-                    if ((player_marks[count_player-1]+4+corner[index_corner])%3 == 0)
-                    {
-                        for (int i = index_corner; i < counter_corner; i++)
-                        {
-                            corner[i] = corner[i+1];
-                        }
-                        corner[counter_corner] = -1;
-                        counter_corner--;
-                        base--;
-                        int temp ;
-                        for (int i = 0; i < counter_corner; i++)
-                        {
-                            if (player_marks[count_player-1]==corner[i])
-                            {
-                                temp = i;
-                                break;
-                            }
-                        }
-                        for (int i = temp; i < count_player; i++)
-                        {
-                            corner[i] = corner[i+1];
-                        }
-                        corner[counter_corner-1] = -1;
-                        counter_corner--;
-                        base--;    
-                    }
-                }
-                
-                int res = set_mark_sp(m,tab,corner[index_corner],bot_marks,count_bot);
-                if (res == -1)
-                {
-                    fprintf(stderr,"problems appear when setting mark.\n");
-                    return;
-                }else{
-                    count_bot = res;
-                }
-                
-                sum_bot += index_corner;
-                //---------------------------------------------------------------------//
-            }else if (count_bot == 2)
-            {
-                
-                //-------------------------------------------------------//
-                bool exit = false;
+    int move = find_tactical_move(tab, b, BOT);
+    if (move != -1) {
+        return move;
+    }
 
-                int win_arr[9][3] = {{0,1,2},{3,4,5},{6,7,8},{0,3,6},{1,4,7},{2,5,8},{0,4,8},{6,4,2}};
-                int size_arr = sizeof(win_arr)/sizeof(win_arr[0][0]);
-                int element_arr[3];
+    move = find_tactical_move(tab, b, PLAYER);
+    if (move != -1) {
+        return move;
+    }
 
-                element_arr[0] = bot_marks[0];
-                element_arr[1] = bot_marks[1];
-                element_arr[2] = 2;
-                if (check_win_in(win_arr,size_arr,element_arr))
-                {
-                            
-                }
-                for (int i = 0; i < 9; i++)
-                {   
-                    for (int j = 0; j < count_player; j++)
-                        {
-                            if(player_marks[j] == i){
-                                exit = true;
-                                break;
-                            } 
-                        }
-                    
-                    if (exit)
-                    {
-                        exit = false;
-                        continue;
-                    }
-                    
-                    if ((sum_player + i)%3 == 0)
-                    {
-                        if (tab[i] == -1)
-                        {
-                            int res = set_mark_sp(m,tab,i,bot_marks,count_bot);
-                            if (res == -1)
-                            {
-                                fprintf(stderr,"problems appear when setting mark.\n");
-                                return;
-                            }else{
-                                count_bot = res;
-                            }
-                            
-                            sum_bot += i;
-                            return;
-                        }     
-                    } 
-                }
-                exit = false;
-                //-----------------------------------------------------------//
-                for (int i = 0; i < 9; i++)
-                {
-                    for (int j = 0; j < count_bot; j++)
-                        {
-                            if(bot_marks[j] == i){
-                                exit = true;
-                                break;
-                            } 
-                        }
+    move = choose_empty_corner(tab, b);
+    if (move != -1) {
+        return move;
+    }
 
-                    if (exit)
-                    {
-                        exit = false;
-                        continue;
-                    }
-                    
-                    if ((sum_bot + i)%3 == 0)
-                    {
-                        if (tab[i] == -1)
-                        {
-                            int res = set_mark_sp(m,tab,i,bot_marks,count_bot);
-                            if (res == -1)
-                            {
-                                fprintf(stderr,"problems appear when setting mark.\n");
-                                return;
-                            }else{
-                                count_bot = res;
-                            }
-                            
-                            sum_bot += i;
-                            return;
-                        }     
-                    } 
-                }
-                //------------------------------------------//
-                int index_corner = rand()%base;
-
-                if ((player_marks[count_player-1]+4+corner[index_corner])%3 == 0)
-                    {
-                        for (int i = index_corner; i < counter_corner; i++)
-                        {
-                            corner[i] = corner[i+1];
-                        }
-                        corner[counter_corner] = -1;
-                        counter_corner--;
-                        base--;
-                        int temp ;
-                        for (int i = 0; i < counter_corner; i++)
-                        {
-                            if (player_marks[count_player-1]==corner[i])
-                            {
-                                temp = i;
-                                break;
-                            }
-                        }
-                        for (int i = temp; i < count_player; i++)
-                        {
-                            corner[i] = corner[i+1];
-                        }
-                        corner[counter_corner-1] = -1;
-                        counter_corner--;
-                        base--;    
-                    }
-
-                    index_corner = rand()%base;
-
-                while (tab[corner[index_corner]] != -1)
-                {
-                    index_corner = rand()%base;
-                    
-                    if ((player_marks[count_player-1]+4+corner[index_corner])%3 == 0)
-                    {
-                        for (int i = index_corner; i < counter_corner; i++)
-                        {
-                            corner[i] = corner[i+1];
-                        }
-                        corner[counter_corner] = -1;
-                        counter_corner--;
-                        base--;
-                        int temp ;
-                        for (int i = 0; i < counter_corner; i++)
-                        {
-                            if (player_marks[count_player-1]==corner[i])
-                            {
-                                temp = i;
-                                break;
-                            }
-                        }
-                        for (int i = temp; i < counter_corner; i++)
-                        {
-                            corner[i] = corner[i+1];
-                        }
-                        corner[counter_corner-1] = -1;
-                        counter_corner--;
-                        base--;    
-                    }
-                }
-                
-                int res = set_mark_sp(m,tab,corner[index_corner],bot_marks,count_bot);
-                if (res == -1)
-                {
-                    fprintf(stderr,"problems appear when setting mark.\n");
-                    return;
-                }else{
-                    count_bot = res;
-                }
-                
-                sum_bot += corner[index_corner];
-                //-------------------------------------------//
-
-            }else if (count_bot == 3)
-            {
-                //------------------------------------------------------------------------------//
-                int first_sum = player_marks[count_player-1]+player_marks[count_player-2];
-                int second_sum = player_marks[count_player-1]+player_marks[count_player-3];
-
-                bool exit = true;
-
-                for (int i = 0; i < 9; i++)
-                {   
-                    for (int j = 0; j < count_player; j++)
-                        {
-                            if(player_marks[j] == i){
-                                exit = true;
-                                break;
-                            } 
-                        }
-                    
-                    if (exit)
-                    {
-                        exit = false;
-                        continue;
-                    }
-
-                    if ((first_sum + i)%3 == 0)
-                    {
-                        if (tab[i] == -1)
-                        {
-                            int res = set_mark_sp(m,tab,i,bot_marks,count_bot);
-                            if (res == -1)
-                            {
-                                fprintf(stderr,"problems appear when setting mark.\n");
-                                return;
-                            }else{
-                                count_bot = res;
-                            }
-                            
-                            sum_bot += i;
-                            return;
-                        }     
-                    } 
-                }
-
-                exit = false;
-
-                for (int i = 0; i < 9; i++)
-                {
-                    for (int j = 0; j < count_player; j++)
-                        {
-                            if(player_marks[j] == i){
-                                exit = true;
-                                break;
-                            } 
-                        }
-
-                    if (exit)
-                    {
-                        exit = false;
-                        continue;
-                    }
-                    
-                    if ((second_sum + i)%3 == 0)
-                    {
-                        if (tab[i] == -1)
-                        {
-                            int res = set_mark_sp(m,tab,i,bot_marks,count_bot);
-                            if (res == -1)
-                            {
-                                fprintf(stderr,"problems appear when setting mark.\n");
-                                return;
-                            }else{
-                                count_bot = res;
-                            }
-                            
-                            sum_bot += i;
-                            return;
-                        }     
-                    } 
-                }
-                //----------------------------------------------------------------//
-                first_sum = bot_marks[count_bot-1]+bot_marks[count_bot-2];
-                second_sum = bot_marks[count_bot-1]+bot_marks[count_bot-3];
-
-                exit = false;
-
-                for (int i = 0; i < 9; i++)
-                {   
-                    for (int j = 0; j < count_bot; j++)
-                        {
-                            if(bot_marks[j] == i){
-                                exit = true;
-                                break;
-                            } 
-                        }
-                    
-                    if (exit)
-                    {
-                        exit = false;
-                        continue;
-                    }
-
-                    if ((first_sum + i)%3 == 0)
-                    {
-                        if (tab[i] == -1)
-                        {
-                             int res = set_mark_sp(m,tab,i,bot_marks,count_bot);
-                            if (res == -1)
-                            {
-                                fprintf(stderr,"problems appear when setting mark.\n");
-                                return;
-                            }else{
-                                count_bot = res;
-                            }
-                            
-                            sum_bot += i;
-                            return;
-                        }     
-                    } 
-                }
-
-                exit = false;
-
-                for (int i = 0; i < 9; i++)
-                {
-                    for (int j = 0; j < count_bot; j++)
-                        {
-                            if(bot_marks[j] == i){
-                                exit = true;
-                                break;
-                            } 
-                        }
-
-                    if (exit)
-                    {
-                        exit = false;
-                        continue;
-                    }
-                    
-                    if ((second_sum + i)%3 == 0)
-                    {
-                        if (tab[i] == -1)
-                        {
-                            int res = set_mark_sp(m,tab,i,bot_marks,count_bot);
-                            if (res == -1)
-                            {
-                                fprintf(stderr,"problems appear when setting mark.\n");
-                                return;
-                            }else{
-                                count_bot = res;
-                            }
-                            
-                            sum_bot += i;
-                            return;
-                        }     
-                    } 
-                }
-                //---------------------------------------------------------------------------------//
-
-                index = rand()%9;
-
-                while (tab[index] != -1)
-                {
-                    index = rand()%9;
-                    
-                }
-                
-            }else if (count_bot == 4)
-            {
-                index = rand()%9;
-
-                while (tab[index] != -1)
-                {
-                    index = rand()%9; 
-                }
-                int res = set_mark_sp(m,tab,index,bot_marks,count_bot);
-                if (res == -1)
-                {
-                    fprintf(stderr,"problems appear when setting mark.\n");
-                    return;
-                }else{
-                    count_bot = res;
-                }        
-                sum_bot += index;
-            }else if (count_bot == 5)
-            {
-                index = rand()%9;
-
-                while (tab[index] != -1)
-                {
-                    index = rand()%9; 
-                }
-                int res = set_mark_sp(m,tab,index,bot_marks,count_bot);
-                if (res == -1)
-                {
-                    fprintf(stderr,"problems appear when setting mark.\n");
-                    return;
-                    }else{
-                    count_bot = res;
-                    }        
-                sum_bot += index;
-            }  
-        }else{
-            int bot_marks[5];
-            int player_marks[4];
-
-            int corner[4] = {0,2,6,8};
-            int mids[4] = {1,3,5,7};
-            int counter_mids = 4;
-            int base_mids = 4;
-            int counter_corner = 4;
-            int base_corner = 4;
-
-            int sum_player = 0;
-            int sum_bot = 0;
-
-            int count_bot = 0;
-            int count_player = 0;
-
-            if (count_bot == 0)
-            {
-                if (tab[4] == -1)
-                {
-                    int res = set_mark_sp(m,tab,4,bot_marks,count_bot);
-                    if (res == -1)
-                    {
-                        fprintf(stderr,"problems appear when setting mark.\n");
-                        return;
-                    }else{
-                        count_bot = res;
-                    }        
-                    sum_bot += 4;
-                }else{
-
-                    int index_corner = rand()%base_corner;
-                    int res = set_mark_sp(m,tab,corner[index_corner],bot_marks,count_bot);
-                    if (res == -1)
-                    {
-                        fprintf(stderr,"problems appear when setting mark.\n");
-                        return;
-                    }else{
-                        count_bot = res;
-                    }
-                    sum_bot += corner[index_corner];
-
-                    for (int i = index_corner; i < counter_corner; i++)
-                        {
-                            corner[i] = corner[i+1];
-                        }
-                        corner[counter_corner-1] = -1;
-                        counter_corner--;
-                        base_corner--; 
-                }
-            }else if (count_bot == 1)
-            {
-                
-            }else if (count_bot == 2)
-            {
-                
-            }
-            else if(count_bot == 3)
-            {
-
-            }else if (count_bot == 4)
-            {
-                
-            } 
-        }  
-}*/
+    return choose_empty_square(tab);
+}

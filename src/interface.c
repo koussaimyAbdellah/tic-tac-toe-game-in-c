@@ -261,9 +261,9 @@ static int read_diffuclty_level_for_bot(){
             printf("2-amateur(try to win agains you in some moves.)\n");
             printf("3-mid-easy(do some effort agains you.)\n");
             printf("4-mid(try to win in any move.)\n");
+            printf("5- mid-hard.\n");
             printf("-------------------------------------------------\n");
 
-            
             int resl = read_input(&diffuclty);
             if (resl == -1)
             {
@@ -275,7 +275,7 @@ static int read_diffuclty_level_for_bot(){
                 printf("please give the correct option(number of option).\n");
                 continue;
             } 
-            if (diffuclty<0 || diffuclty > 4)
+            if (diffuclty<0 || diffuclty > 5)
             {
                 printf("please give the correct option.\n");
                 continue;
@@ -419,7 +419,7 @@ int get_index(){
 void game_start(game_info *gm){
     bool game_over = false;
 
-    int eval;
+    int eval = -2;
     int index;
 
     while (!game_over)
@@ -471,7 +471,18 @@ void game(char mark){
 }
 
 int get_index_bot(game_info *gm){
-    return gm->stratigie(gm->tab);
+    if (gm->stratigie == NULL)
+    {
+        printf("it option 5\n");
+        return gm->move(gm->tab,gm->b);
+        
+    }else if (gm->move == NULL)
+    {   printf("it other option.\n");
+        return gm->stratigie(gm->tab);
+    }else {
+        printf("non of startigie was invalid.\n");
+        return -1;
+    }
 }
 
 static void print_game_stats(game_info *gm,bool is_bot_round){
@@ -575,7 +586,60 @@ void game_start_solo(game_info *gm){
     } 
 }
 
-bool bot_init_value = true;
+bot_info* create_bot_info(){
+    bot_info *b = malloc(sizeof(bot_info));
+    
+    if (b == NULL)
+    {
+        fprintf(stderr,"null pointer cannot allocate memory.\n");
+        exit(1);
+    }
+    
+    int win_arrs[8][3] = {
+        {0,1,2}, {3,4,5}, {6,7,8},
+        {0,3,6}, {1,4,7}, {2,5,8},
+        {0,4,8}, {6,4,2}
+    };
+
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            b->win_arr[i][j] = win_arrs[i][j];
+        }
+    }
+    
+   
+    b->bot_init_value = true;
+
+    b->size_a = (int)(sizeof(win_arrs) / sizeof(win_arrs[0]));
+
+    b->arr_element = malloc(sizeof(int) * 3);
+    if (b->arr_element == NULL) {
+        fprintf(stderr, "cannot allocate bot move buffer.\n");
+        free(b);
+        exit(EXIT_FAILURE);
+    }
+    b->size_e = 3;
+
+    //static
+    int corner[4] = {0,2,6,8};
+    int empthy_case[5] = {1,3,4,5,7};
+
+    for (int i = 0; i < 4; i++)
+    {
+        b->corner[i] = corner[i];
+    }
+    for (int i = 0; i < 5; i++)
+    {
+        b->empthy_case[i] = empthy_case[i];
+    }
+    
+    b->counter_corner = 4;
+    b->counter_case = 5;
+
+    return b;
+}
 
 void game_solo(char mark,int diff){
     bot_move *arr_st = create_stratigie_bot();
@@ -585,16 +649,29 @@ void game_solo(char mark,int diff){
         fprintf(stderr,"invalid pointer: null pointer.\n");
         exit(1);
     }
+    
+    game_info *gm;
+    bot_info *bi;
 
-    game_info *gm = game_init(mark,diff,arr_st);
+    if (diff == 5)
+    {
+        bi = create_bot_info();
+
+        gm = game_init_5(mark,bot_index_5);
+
+        if (gm->m->bot = gm->m->last_round)
+        {
+            bi->bot_init_value = true;
+        }else{
+            bi->bot_init_value = false;
+        }
+
+    }else{
+        gm = game_init(mark,diff,arr_st);
+    }  
 
     game_start_solo(gm);
 
-    if (!bot_init_value)
-    {
-        bot_init_value = true;
-    }
-    
+    free(bi);
     free(arr_st);
-    arr_st = NULL;
 }

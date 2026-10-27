@@ -153,6 +153,7 @@ bool set_mark(marks* m,int *tab,int index){
 
         return arr_st;
     }
+    
 game_info *game_init(char m,int i,bot_move *arr_st){
     game_info *new_game = malloc(sizeof(game_info));
     
@@ -185,6 +186,40 @@ game_info *game_init(char m,int i,bot_move *arr_st){
         new_game->stratigie = arr_st[i]; 
     }
     
+    new_game->m = new_mark;
+    new_game->tab = new_tab;
+    new_game->empthy_count = 9;
+
+    return new_game;
+}
+
+game_info *game_init_5(char m,bot_move5 move){
+    game_info *new_game = malloc(sizeof(game_info));
+    
+    if (new_game == NULL)
+    {
+        perror("allocation error: cannot allocat memroy for new_game.\n");
+        exit(1);
+    }
+
+    marks *new_mark = create_choice_mark(m);
+    
+    if (new_mark == NULL)
+    {
+        perror("allocation error: cannot allocat memroy for new_mark.\n");
+        exit(1);
+    }
+
+    int *new_tab = init_table(new_mark);
+
+    if (new_tab == NULL)
+    {
+        perror("allocation error: cannot allocat memroy for new_tab.\n");
+        exit(1);
+    }
+
+    new_game->move = move;  
+
     new_game->m = new_mark;
     new_game->tab = new_tab;
     new_game->empthy_count = 9;
